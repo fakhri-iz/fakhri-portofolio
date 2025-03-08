@@ -1,29 +1,38 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/assets";
 
 const Navbar = ({ isDarkMode, setIsDarkMode }) => {
-  const [isScroll, setIsScroll] = useState();
-  const sideMenuRef = useRef();
+  const [isScroll, setIsScroll] = useState(false);
+  const sideMenuRef = useRef(null);
 
   const openMenu = () => {
-    sideMenuRef.current.style.transform = "translateX(-16rem)";
+    if (sideMenuRef.current) {
+      sideMenuRef.current.style.transform = "translateX(-16rem)";
+    }
   };
 
   const closeMenu = () => {
-    sideMenuRef.current.style.transform = "translateX(16rem)";
+    if (sideMenuRef.current) {
+      sideMenuRef.current.style.transform = "translateX(16rem)";
+    }
   };
 
-  useState(() => {
-    window.addEventListener("scroll", () => {
-      if (scrollY > 50) {
-        setIsScroll(true);
-      } else {
-        setIsScroll(false);
-      }
-    });
-  });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleScroll = () => {
+        if (window.scrollY > 50) {
+          setIsScroll(true);
+        } else {
+          setIsScroll(false);
+        }
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll); // Cleanup event listener
+    }
+  }, []);
 
   return (
     <>
@@ -37,10 +46,10 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
             : ""
         }`}
       >
-        <a href="">
+        <a href="#">
           <Image
             src={isDarkMode ? assets.logo_dark : assets.logo}
-            alt=""
+            alt="Logo"
             className="w-28 cursor-pointer mr-14"
           />
         </a>
@@ -83,7 +92,7 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
           <button onClick={() => setIsDarkMode((prev) => !prev)}>
             <Image
               src={isDarkMode ? assets.sun_icon : assets.moon_icon}
-              alt=""
+              alt="Theme Toggle"
               className="w-6"
             />
           </button>
@@ -95,7 +104,7 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
             Contact
             <Image
               src={isDarkMode ? assets.arrow_icon_dark : assets.arrow_icon}
-              alt=""
+              alt="Arrow Icon"
               className="w-3"
             />
           </a>
@@ -103,23 +112,25 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
           <button className="block md:hidden ml-3" onClick={openMenu}>
             <Image
               src={isDarkMode ? assets.menu_white : assets.menu_black}
-              alt=""
+              alt="Menu Icon"
               className="w-6"
             />
           </button>
         </div>
 
-        {/*-- ----- mobile menu ------ --*/}
+        {/* Mobile Menu */}
         <ul
           ref={sideMenuRef}
           className="flex md:hidden flex-col gap-4 py-20 px-10 fixed -right-64 top-0 bottom-0 w-64 z-50 h-screen bg-rose-50 transition duration-500 dark:bg-darkHover dark:text-white"
         >
-          <div className="absolute right-6 top-6" onClick={closeMenu}>
-            <Image
-              src={isDarkMode ? assets.close_white : assets.close_black}
-              alt=""
-              className="w-5 cursor-pointer"
-            />
+          <div className="absolute right-6 top-6">
+            <button onClick={closeMenu}>
+              <Image
+                src={isDarkMode ? assets.close_white : assets.close_black}
+                alt="Close Menu"
+                className="w-5 cursor-pointer"
+              />
+            </button>
           </div>
 
           <li>
